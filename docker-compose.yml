@@ -1,0 +1,68 @@
+version: "3.7"
+
+services:
+  jenkins:
+    image: yourdevops/jenkinsplusdocker:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - /home/kirillwsl/docker-volumes/jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - cicd
+
+  nexus:
+    image: sonatype/nexus3
+    ports:
+      - 8081:8081
+      - 8083:8083
+    volumes:
+      - nexus-data:/nexus-data
+    networks:
+      - cicd
+
+  sonarqube:
+    image: sonarqube:8.9-community
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65535
+        hard: 65535
+    ports:
+      - 9000:9000
+    networks:
+      - cicd
+    environment:
+      - SONARQUBE-JDBC_URL=jdbc:postgresql://postgres:5432/sonar
+      - SONARQUBE-JDBC_USERNAME=sonaruser
+      - SONARQUBE-JDBC_PASSWORD=sonarpass
+    volumes:
+      - sonarqube-conf:/opt/sonarqube/conf
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-extensions:/opt/sonarqube/extensions
+      - sonarqube-bundle-plugins:/opt/sonarqube/lib/bundle-plugins
+
+  postgres:
+    image: postgres:12
+    networks:
+      - cicd
+    environment:
+      - POSTGRES_USER=sonaruser
+      - POSTGRES_PASSWORD=sonarpass
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql-data:/var/lib/postgresql/data
+
+volumes:
+  sonarqube-conf:
+  sonarqube-data:
+  sonarqube-extensions:
+  sonarqube-bundle-plugins:
+  postgresql:
+  postgresql-data:
+  nexus-data:
+    
+networks:
+  cicd:
