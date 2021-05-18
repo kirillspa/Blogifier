@@ -24,7 +24,7 @@ RUN dotnet restore -v m
 RUN dotnet build --no-restore --nologo
 RUN dotnet publish ./src/Blogifier/Blogifier.csproj -o ./outputs
 # Getting code coverage report
-RUN coverlet /opt/blogifier/tests/Blogifier.Tests/bin/Debug/net5.0/Blogifier.Tests.dll --target "dotnet" --targetargs "test --no-build" --format opencover
+#RUN coverlet /opt/blogifier/tests/Blogifier.Tests/bin/Debug/net5.0/Blogifier.Tests.dll --target "dotnet" --targetargs "test --no-build" --format opencover
 # Finishing sonarscan
 RUN dotnet sonarscanner end /d:sonar.login="4ec08525728c3cc8d8146f798ed4b392cf1bb9f2"
 
